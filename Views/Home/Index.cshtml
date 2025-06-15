@@ -10,217 +10,686 @@
     <meta http-equiv="cache-control" content="max-age=604800" />
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
-    <title>Website title - bootstrap html template</title>
+    <title>TechMall - Your Technology Destination</title>
 
     <link href="~/content/images/favicon.ico" rel="shortcut icon" type="image/x-icon">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
-    
+    <style>
+        :root {
+            --primary-orange: #FF6B35;
+            --secondary-orange: #FF8E53;
+            --light-orange: #FFF4F0;
+            --dark-orange: #E55A2B;
+            --accent-orange: #FFB899;
+            --text-dark: #2C3E50;
+            --text-light: #6C757D;
+            --bg-light: #F8F9FA;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #FFF4F0 0%, #FFFFFF 100%);
+            color: var(--text-dark);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1400px;
+        }
+
+        /* Header Section */
+        .section-main {
+            padding: 2rem 0;
+        }
+
+        .main-card {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(255, 107, 53, 0.1);
+            border: none;
+            overflow: hidden;
+        }
+
+        /* Sidebar Categories */
+        .sidebar-categories {
+            color: white;
+            padding: 2rem;
+            border-radius: 20px 0 0 20px;
+        }
+
+        .sidebar-categories h6 {
+            color: black;
+            font-weight: 700;
+            font-size: 1.1rem;
+            margin-bottom: 1.5rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .menu-category {
+            list-style: none;
+            padding: 0;
+        }
+
+        .menu-category li {
+            margin-bottom: 0.5rem;
+        }
+
+        .menu-category li a {
+            color: white;
+            text-decoration: none;
+            padding: 0.7rem 1rem;
+            border-radius: 10px;
+            display: block;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .menu-category li a:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateX(5px);
+        }
+
+        /* Carousel */
+        .slider-home-banner {
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .carousel-item img {
+            height: 350px;
+            object-fit: cover;
+            width: 100%;
+        }
+
+        .carousel-control-prev,
+        .carousel-control-next {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            top: 50%;
+            transform: translateY(-50%);
+            opacity: 0.9;
+        }
+
+        .carousel-control-prev {
+            left: 20px;
+        }
+
+        .carousel-control-next {
+            right: 20px;
+        }
+
+        /* Popular Categories */
+        .popular-categories {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(255, 107, 53, 0.1);
+            overflow: hidden;
+        }
+
+        .popular-categories h6 {
+            color: black;
+            padding: 1rem;
+            margin: 0;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        .card-banner {
+            padding: 1rem;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+
+        .card-banner:hover {
+            background: var(--light-orange);
+            transform: translateY(-2px);
+        }
+
+        .card-banner:last-child {
+            border-bottom: none;
+        }
+
+        .card-banner img {
+            border-radius: 10px;
+            margin-left: auto;
+        }
+
+        .card-banner .btn {
+            border: none;
+            border-radius: 25px;
+            padding: 0.5rem 1.5rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .card-banner .btn:hover {
+            background: var(--dark-orange);
+            transform: translateY(-2px);
+        }
+
+        /* Product Cards */
+        .product-card {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            border: none;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+        }
+
+        .product-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 15px 40px rgba(255, 107, 53, 0.15);
+        }
+
+        .product-card .img-wrap {
+            background: var(--light-orange);
+            height: 200px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .product-card .img-wrap img {
+            transition: transform 0.3s ease;
+        }
+
+        .product-card:hover .img-wrap img {
+            transform: scale(1.05);
+        }
+
+        .product-card .card-body {
+            padding: 1.5rem;
+        }
+
+        .product-card .card-title {
+            font-weight: 600;
+            font-size: 0.95rem;
+            margin-bottom: 0.8rem;
+            color: var(--text-dark);
+        }
+
+        .product-card .card-title a {
+            color: var(--text-dark);
+            text-decoration: none;
+        }
+
+        .product-card .card-title a:hover {
+            color: var(--primary-orange);
+        }
+
+        .product-price {
+            color: var(--primary-orange);
+            font-weight: 700;
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
+        }
+
+        .addtocart {
+            background: linear-gradient(135deg, var(--primary-orange), var(--secondary-orange));
+            border: none;
+            border-radius: 25px;
+            color: white;
+            font-weight: 500;
+            padding: 0.7rem 1.5rem;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+
+        .addtocart:hover {
+            background: linear-gradient(135deg, var(--dark-orange), var(--primary-orange));
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 107, 53, 0.3);
+        }
+
+        .section-title {
+            font-weight: 700;
+            color: var(--text-dark);
+            font-size: 1.8rem;
+            position: relative;
+            padding-bottom: 0.5rem;
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 50px;
+            height: 3px;
+            background: linear-gradient(135deg, var(--primary-orange), var(--secondary-orange));
+            border-radius: 2px;
+        }
+
+        .btn-view-all {
+            background: transparent;
+            color: var(--primary-orange);
+            border: 2px solid var(--primary-orange);
+            border-radius: 25px;
+            padding: 0.5rem 1.5rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .btn-view-all:hover {
+            background: var(--primary-orange);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        /* Deal Section */
+        .deal-section {
+            background: linear-gradient(135deg, var(--primary-orange), var(--secondary-orange));
+            border-radius: 20px;
+            color: white;
+            padding: 3rem;
+            margin: 3rem 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .deal-section::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+            animation: pulse 4s ease-in-out infinite;
+        }
+
+        .deal-content {
+            position: relative;
+            z-index: 2;
+        }
+
+        .timer {
+            display: flex;
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .timer div {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            padding: 1rem;
+            text-align: center;
+            min-width: 80px;
+        }
+
+        .timer .num {
+            display: block;
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .timer small {
+            font-size: 0.8rem;
+            opacity: 0.8;
+        }
+
+        /* Quote Section */
+        .quote-section {
+            background: linear-gradient(135deg, var(--light-orange), rgba(255, 107, 53, 0.1));
+            border-radius: 20px;
+            padding: 3rem;
+            margin: 3rem 0;
+        }
+
+        .quote-form {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(255, 107, 53, 0.1);
+        }
+
+        .quote-form .form-control {
+            border-radius: 10px;
+            border: 2px solid #eee;
+            padding: 0.8rem 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .quote-form .form-control:focus {
+            border-color: var(--primary-orange);
+            box-shadow: 0 0 0 0.2rem rgba(255, 107, 53, 0.25);
+        }
+
+        .btn-quote {
+            background: linear-gradient(135deg, var(--primary-orange), var(--secondary-orange));
+            border: none;
+            border-radius: 25px;
+            padding: 0.8rem 2rem;
+            font-weight: 600;
+            color: white;
+            transition: all 0.3s ease;
+        }
+
+        .btn-quote:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 107, 53, 0.3);
+        }
+
+        /* Services Section */
+        .service-card {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            border: none;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+        }
+
+        .service-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(255, 107, 53, 0.15);
+        }
+
+        .service-card img {
+            height: 200px;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+
+        .service-card:hover img {
+            transform: scale(1.05);
+        }
+
+        .service-card .card-body {
+            padding: 1.5rem;
+        }
+
+        .service-card .title {
+            color: var(--text-dark);
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        /* Animation */
+        .fade-in {
+            animation: fadeIn 0.8s ease-in-out;
+        }
+    </style>
+
+    <script>
+        $(document).on("click", ".addtocart", function () {
+            var model = {
+                Id: $(this).data("id"),
+                Quantity: 1
+            };
+
+            $.ajax({
+                type: "POST",
+                url: '/Cart/AddToCart',
+                data: JSON.stringify(model),
+                dataType: "json",
+                contentType: "application/json; charset=utf-8",
+                success: function () {
+                    toastr.success("Đã thêm vào giỏ hàng!");
+                    let count = parseInt($('#CartCount').text()) + 1;
+                    $('#CartCount').text(count);
+                },
+                error: function () {
+                    toastr.error("Không thể thêm vào giỏ!");
+                }
+            });
+
+            return false;
+        });
+    </script>
 </head>
 <body>
 
-
-
-
     <div class="container">
         <!-- ========================= SECTION MAIN  ========================= -->
-        <section class="section-main padding-y">
-            <main class="card">
-                <div class="card-body">
-
-                    <div class="row">
-                        <aside class="col-lg col-md-3 flex-lg-grow-0">
-                            <h6>DANH MỤC</h6>
+        <section class="section-main">
+            <main class="main-card card">
+                <div class="card-body p-0">
+                    <div class="row g-0">
+                        <aside class="col-lg-3 col-md-4 sidebar-categories">
+                            <h6><i class="fas fa-list-ul me-2"></i>DANH MỤC</h6>
                             <nav class="nav-home-aside">
                                 <ul class="menu-category">
-                                    <li><a href="/Home/Grid/0">Tất cả</a></li>
+                                    <li><a href="/Home/Grid/0"><i class="fas fa-th-large me-2"></i>Tất cả</a></li>
                                     @foreach (var item in Model.ListCategory.Take(8))
                                     {
-                                        <li>@Html.ActionLink(item.Name, "Grid", "Home", new { @Id = item.Id }, null)</li>
+                                        <li>@Html.ActionLink(item.Name, "Grid", "Home", new { @Id = item.Id }, new { @class = "category-link" })</li>
                                     }
-                                    @*<li class="has-submenu">
-                                        <a href="#">More items</a>
-                                        <ul class="submenu">
-                                            <li><a href="#">Submenu name</a></li>
-                                            <li><a href="#">Great submenu</a></li>
-                                            <li><a href="#">Another menu</a></li>
-                                            <li><a href="#">Some others</a></li>
-                                        </ul>
-                                    </li>*@
                                 </ul>
                             </nav>
-                        </aside> <!-- col.// -->
-                        <div class="col-md-9 col-xl-7 col-lg-7">
+                        </aside>
 
-                            <!-- ================== COMPONENT SLIDER  BOOTSTRAP  ==================  -->
-                            <div id="carousel1_indicator" class="slider-home-banner carousel slide" data-ride="carousel">
-                                <ol class="carousel-indicators">
-                                    <li data-target="#carousel1_indicator" data-slide-to="0" class="active"></li>
-                                    <li data-target="#carousel1_indicator" data-slide-to="1"></li>
-                                    <li data-target="#carousel1_indicator" data-slide-to="2"></li>
-                                </ol>
-                                <div class="carousel-inner">
-                                    <div class="carousel-item active">
-                                        <img src="~/content/images/banners/slide1.jpg" alt="First slide">
-                                    </div>
-                                    <div class="carousel-item">
-                                        <img src="~/content/images/banners/slide2.jpg" alt="Second slide">
-                                    </div>
-                                    <div class="carousel-item">
-                                        <img src="~/content/images/banners/slide3.jpg" alt="Third slide">
-                                    </div>
-                                </div>
-                                <a class="carousel-control-prev" href="#carousel1_indicator" role="button" data-slide="prev">
-                                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                                    <span class="sr-only">Previous</span>
-                                </a>
-                                <a class="carousel-control-next" href="#carousel1_indicator" role="button" data-slide="next">
-                                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                                    <span class="sr-only">Next</span>
-                                </a>
-                            </div>
-                            <!-- ==================  COMPONENT SLIDER BOOTSTRAP end.// ==================  .// -->
-
-                        </div> <!-- col.// -->
-                        <div class="col-md d-none d-lg-block flex-grow-1">
-                            <aside class="special-home-right">
-                                <h6 class="bg-blue text-center text-white mb-0 p-2">Danh mục phổ biến</h6>
-                                @foreach (var item in Model.ListCategory.Where(n => n.ShowOnHomePage == true).Take(3))
-                                {
-                                    <div class="card-banner border-bottom">
-                                        <div class="py-3" style="width:80%">
-                                            <h6 class="card-title">@item.Name</h6>
-                                            <a href="@Url.Action("Grid", "Home", new { @Id = item.Id },null)" class="btn btn-secondary btn-sm"> Mua ngay </a>
+                        <div class="col-lg-6 col-md-8">
+                            <div class="p-4">
+                                <div id="carousel1_indicator" class="slider-home-banner carousel slide" data-bs-ride="carousel">
+                                    <ol class="carousel-indicators">
+                                        <li data-bs-target="#carousel1_indicator" data-bs-slide-to="0" class="active"></li>
+                                        <li data-bs-target="#carousel1_indicator" data-bs-slide-to="1"></li>
+                                        <li data-bs-target="#carousel1_indicator" data-bs-slide-to="2"></li>
+                                    </ol>
+                                    <div class="carousel-inner">
+                                        <div class="carousel-item active">
+                                            <img src="~/content/images/banners/slide1.jpg" alt="First slide">
                                         </div>
-                                        <img src="~/content/images/items/@item.Image" height="80" class="img-bg">
+                                        <div class="carousel-item">
+                                            <img src="~/content/images/banners/slide2.jpg" alt="Second slide">
+                                        </div>
+                                        <div class="carousel-item">
+                                            <img src="~/content/images/banners/slide3.jpg" alt="Third slide">
+                                        </div>
                                     </div>
-                                }
-
-                            </aside>
-                        </div> <!-- col.// -->
-                    </div> <!-- row.// -->
-
-                </div> <!-- card-body.// -->
-            </main> <!-- card.// -->
-
-        </section>
-        <!-- ========================= SECTION MAIN END// ========================= -->
-        <!-- =============== SECTION DEAL =============== -->
-        <section class="padding-bottom">
-            <div class="card card-deal">
-                <div class="col-heading content-body">
-                    <header class="section-heading">
-                        <h3 class="section-title">Siêu giảm giá</h3>
-                        <p>Thiết bị di động</p>
-                    </header>
-                    <!-- sect-heading -->
-                    <div class="timer">
-                        <div> <span class="num" id="days">00</span> <small>Ngày</small></div>
-                        <div> <span class="num" id="hours">00</span> <small>Giờ</small></div>
-                        <div> <span class="num" id="minutes">00</span> <small>Phút</small></div>
-                        <div> <span class="num" id="seconds">00</span> <small>Giây</small></div>
-                    </div>
-                </div>
-                <div class="row no-gutters items-wrap">
-                    @foreach (var item in Model.ListProduct.Where(n => n.TypeId == 2).Take(5))
-                    {
-                        <div class="col-md col-6">
-                            <figure class="card-product-grid card-sm">
-                                <a href="@Url.Action("Detail", "Product", new {Id=item.Id})" class="img-wrap">
-                                    <img src="~/content/images/items/@item.Image">
-                                </a>
-                                <div class="text-wrap p-3">
-
-                                    @Html.ActionLink(item.Name, "Detail", "Product", new { Id = item.Id }, null)
-                                    <span class="badge badge-danger"> -20% </span>
+                                    <button class="carousel-control-prev" type="button" data-bs-target="#carousel1_indicator" data-bs-slide="prev">
+                                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                        <span class="visually-hidden">Previous</span>
+                                    </button>
+                                    <button class="carousel-control-next" type="button" data-bs-target="#carousel1_indicator" data-bs-slide="next">
+                                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                        <span class="visually-hidden">Next</span>
+                                    </button>
                                 </div>
-                            </figure>
-                        </div> <!-- col.// -->
-                    }
-                </div>
-            </div>
-
-        </section>
-        <!-- =============== SECTION DEAL // END =============== -->
-        <!-- =============== SECTION 1 =============== -->
-        @foreach (var brand in Model.ListBrand)
-        {
-            <section class="padding-bottom">
-                <header class="section-heading heading-line">
-                    <h4 class="title-section text-uppercase">@brand.Name</h4>
-                </header>
-
-                <div class="card card-home-category">
-                    <div class="row no-gutters">
-                        <div class="col-md-3">
-
-                            <div class="home-category-banner bg-light-orange">
-                                <h5 class="title">Sản phẩm nổi bật từ @brand.Name</h5>
-                                <p>
-                                    Sự apisisis sẽ được tuân theo, nhưng nó sẽ xảy ra cùng lúc với một số lao động và đau đớn lớn lao.
-                                </p>
-                                <a href="#" class="btn btn-outline-primary rounded-pill">Mua ngay</a>
-                                <img src="~/content/images/items/@brand.Image" class="img-bg">
-                            </div>
-
-                        </div> <!-- col.// -->
-                        <div class="col-md-9">
-                            <ul class="row no-gutters bordered-cols">
-                                @foreach (var item in Model.ListProduct.Where(p => p.BrandId == brand.Id))
-                                {
-                                    <li class="col-6 col-lg-3 col-md-4">
-                                        <a href="@Url.Action("Detail", "Product", new { Id = item.Id })" class="item">
-
-                                            <div class="card-body">
-                                                <h6 class="title">@item.ShortDes  </h6>
-                                                <img class="img-sm float-right" src="~/content/images/items/@item.Image">
-                                                <p class="text-muted"><i class="fa fa-map-marker-alt"></i> Guanjou, China</p>
-                                            </div>
-                                        </a>
-                                    </li>
-                                }
-                            </ul>
-                        </div> <!-- col.// -->
-                    </div> <!-- row.// -->
-                </div> <!-- card.// -->
-            </section>
-        }
-            <!-- =============== SECTION 1 END =============== -->
-            
-            <!-- =============== SECTION REQUEST =============== -->
-
-            <section class="padding-bottom">
-
-                <header class="section-heading heading-line">
-                    <h4 class="title-section text-uppercase">Yêu cầu báo giá</h4>
-                </header>
-
-                <div class="row">
-                    <div class="col-md-8">
-                        <div class="card-banner banner-quote overlay-gradient" style="background-image: url('~/content/images/banners/banner9.jpg');">
-                            <div class="card-img-overlay white">
-                                <h3 class="card-title">Một cách dễ dàng để gửi yêu cầu đến nhà cung cấp</h3>
-                                <p class="card-text" style="max-width: 400px">
-                                    Theo dõi sự phát triển của nhà phát triển, nhưng đây là cách mọi thứ diễn ra đồng thời.
-                                </p>
-                                <a href="" class="btn btn-primary rounded-pill">
-                                    Tìm hiểu thêm
-                                </a>
                             </div>
                         </div>
-                    </div> <!-- col // -->
-                    <div class="col-md-4">
 
-                        <div class="card card-body">
-                            <h4 class="title py-3">Một yêu cầu, nhiều báo giá</h4>
-                            <form>
-                                <div class="form-group">
-                                    <input class="form-control" name="" placeholder="Bạn đang tìm kiếm gì?" type="text">
+                        <div class="col-lg-3 d-none d-lg-block">
+                            <aside class="popular-categories h-100">
+                                <h6><i class="fas fa-fire me-2"></i>Danh mục phổ biến</h6>
+                                @foreach (var item in Model.ListCategory.Where(n => n.ShowOnHomePage == true).Take(3))
+                                {
+                                    <div class="card-banner">
+                                        <div style="flex: 1;">
+                                            <h6 class="card-title mb-2">@item.Name</h6>
+                                            <a href="@Url.Action("Grid", "Home", new { @Id = item.Id })" class="btn btn-primary btn-sm">
+                                                <i class="fas fa-shopping-cart me-1"></i>Mua ngay
+                                            </a>
+                                        </div>
+                                        <img src="~/content/images/items/@item.Image" height="60" class="rounded">
+                                    </div>
+                                }
+                            </aside>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </section>
+        <!-- Deal Section -->
+        <section class="deal-section">
+            <div class="deal-content">
+                <div class="row align-items-center">
+                    <div class="col-md-6">
+                        <h3 class="fw-bold mb-3">
+                            <i class="fas fa-bolt me-2"></i>Siêu giảm giá
+                        </h3>
+                        <p class="mb-3">Thiết bị di động - Giá sốc trong thời gian có hạn!</p>
+                        <div class="timer">
+                            <div>
+                                <span class="num" id="days">00</span>
+                                <small>Ngày</small>
+                            </div>
+                            <div>
+                                <span class="num" id="hours">00</span>
+                                <small>Giờ</small>
+                            </div>
+                            <div>
+                                <span class="num" id="minutes">00</span>
+                                <small>Phút</small>
+                            </div>
+                            <div>
+                                <span class="num" id="seconds">00</span>
+                                <small>Giây</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="row">
+                            @foreach (var item in Model.ListProduct.Where(n => n.TypeId == 2).Take(4))
+                            {
+                                <div class="col-6 mb-3">
+                                    <div class="product-card card">
+                                        <a href="@Url.Action("Detail", "Product", new {Id=item.Id})" class="img-wrap d-flex align-items-center justify-content-center p-2" style="height: 120px;">
+                                            <img src="~/content/images/items/@item.Image" alt="@item.Name" style="max-height: 100%; max-width: 100%; object-fit: contain;">
+                                        </a>
+                                        <div class="card-body p-2">
+                                            <h6 class="card-title small">
+                                                @Html.ActionLink(item.Name, "Detail", "Product", new { Id = item.Id }, new { @class = "text-decoration-none" })
+                                            </h6>
+                                            <span class="badge bg-danger">-20%</span>
+                                        </div>
+                                    </div>
                                 </div>
-                                <div class="form-group">
-                                    <div class="input-group">
-                                        <input class="form-control" placeholder="Số lượng" name="" type="text">
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- Category Products Section -->
+        @foreach (var category in Model.ListCategory)
+        {
+            var products = Model.ListProduct
+                .Where(p => p.CategoryId == category.Id && !(p.Deleted ?? false))
+                .Take(6)
+                .ToList();
 
-                                        <select class="custom-select form-control">
+            if (products.Any())
+            {
+                <section class="mb-5 fade-in">
+                    <header class="section-header d-flex justify-content-between align-items-center bg-white p-3 rounded-top shadow-sm">
+                        <h3 class="mb-0">@category.Name</h3>
+                        <a href="@Url.Action("Grid", "Home", new { Id = category.Id })"
+                           class="btn btn-sm btn-outline-primary">
+                            Xem tất cả <i class="fas fa-arrow-right ms-1"></i>
+                        </a>
+                    </header>
+
+                    <div class="row border border-top-0 rounded-bottom p-3">
+                        @foreach (var item in products)
+                        {
+                            <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 mb-4">
+                                <div class="product-card card h-100 border-0">
+                                    <a href="@Url.Action("Detail", "Product", new { Id = item.Id })"
+                                       class="img-wrap d-flex align-items-center justify-content-center p-3 bg-light rounded">
+                                        <img src="~/content/images/items/@item.Image"
+                                             alt="@item.Name"
+                                             style="max-height: 100%; max-width: 100%; object-fit: contain;" />
+                                    </a>
+                                    <div class="card-body text-center">
+                                        <h6 class="card-title text-truncate">
+                                            <a href="@Url.Action("Detail", "Product", new { Id = item.Id })"
+                                               class="text-dark">@item.Name</a>
+                                        </h6>
+                                        <div class="product-price text-danger font-weight-bold mb-2">
+                                            @String.Format("{0:N0}", item.Price) đ
+                                        </div>
+                                        <button class="btn btn-outline-primary btn-sm addtocart" data-id="@item.Id">
+                                            <i class="fas fa-cart-plus me-1"></i>Thêm vào giỏ
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </section>
+            }
+        }
+
+
+        <!-- Recommended Products -->
+        <section class="mb-5 fade-in">
+            <header class="section-header">
+                <h3 class="section-title">Sản phẩm đề xuất</h3>
+                <div class="badge bg-primary">Đặc biệt</div>
+            </header>
+
+            <div class="row">
+                @foreach (var item in Model.ListProduct.Where(n => n.TypeId == 1))
+                {
+                    <div class="col-xl-2 col-lg-3 col-md-4 col-6 mb-4">
+                        <div class="product-card card h-100">
+                            <a href="@Url.Action("Detail", "Product", new {Id=item.Id})" class="img-wrap d-flex align-items-center justify-content-center p-3">
+                                <img src="~/content/images/items/@item.Image" alt="@item.Name" style="max-height: 100%; max-width: 100%; object-fit: contain;">
+                            </a>
+                            <div class="card-body">
+                                <h6 class="card-title">
+                                    @Html.ActionLink(item.Name, "Detail", "Product", new { Id = item.Id }, new { @class = "text-decoration-none" })
+                                </h6>
+                                <div class="product-price">@String.Format("{0:N0}", item.Price) đ</div>
+                                <button class="addtocart" data-id="@item.Id">
+                                    <i class="fas fa-cart-plus me-2"></i>Thêm vào giỏ
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </section>
+
+        <!-- Quote Request Section -->
+        <section class="quote-section">
+            <div class="row">
+                <div class="col-md-8">
+                    <div class="h-100 d-flex align-items-center">
+                        <div>
+                            <h3 class="fw-bold mb-3">
+                                <i class="fas fa-quote-left me-2"></i>Yêu cầu báo giá
+                            </h3>
+                            <h5 class="text-muted mb-4">Một cách dễ dàng để gửi yêu cầu đến nhà cung cấp</h5>
+                            <p class="mb-4">Nhận báo giá nhanh chóng từ nhiều nhà cung cấp uy tín với chất lượng tốt nhất.</p>
+                            <a href="#" class="btn btn-primary btn-lg">
+                                <i class="fas fa-info-circle me-2"></i>Tìm hiểu thêm
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="quote-form">
+                        <h5 class="mb-4">
+                            <i class="fas fa-paper-plane me-2"></i>Một yêu cầu, nhiều báo giá
+                        </h5>
+                        <form>
+                            <div class="mb-3">
+                                <input class="form-control" placeholder="Bạn đang tìm kiếm gì?" type="text">
+                            </div>
+                            <div class="mb-3">
+                                <div class="row">
+                                    <div class="col-7">
+                                        <input class="form-control" placeholder="Số lượng" type="number">
+                                    </div>
+                                    <div class="col-5">
+                                        <select class="form-select">
                                             <option>Pieces</option>
                                             <option>Litres</option>
                                             <option>Tons</option>
@@ -228,135 +697,225 @@
                                         </select>
                                     </div>
                                 </div>
-                                <div class="form-group text-muted">
-                                    <p>Chọn loại mẫu:</p>
-                                    <label class="form-check form-check-inline">
-                                        <input class="form-check-input" type="checkbox" value="option1">
-                                        <div class="form-check-label">Yêu cầu giá</div>
-                                    </label>
-                                    <label class="form-check form-check-inline">
-                                        <input class="form-check-input" type="checkbox" value="option2">
-                                        <div class="form-check-label">
-                                            Yêu cầu một mẫu
-                                        </div>
-                                    </label>
+                            </div>
+                            <div class="mb-3">
+                                <p class="text-muted mb-2">Chọn loại mẫu:</p>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="quote1">
+                                    <label class="form-check-label" for="quote1">Yêu cầu giá</label>
                                 </div>
-                                <div class="form-group">
-                                    <button class="btn btn-warning">Yêu cầu báo giá</button>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="quote2">
+                                    <label class="form-check-label" for="quote2">Yêu cầu một mẫu</label>
                                 </div>
-                            </form>
+                            </div>
+                            <button type="submit" class="btn-quote w-100">
+                                <i class="fas fa-send me-2"></i>Yêu cầu báo giá
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Services Section -->
+        <section class="mb-5 fade-in">
+            <header class="section-header">
+                <h3 class="section-title">Dịch vụ thương mại</h3>
+                <div class="badge bg-primary">Chuyên nghiệp</div>
+            </header>
+
+            <div class="row">
+                <div class="col-md-3 col-sm-6 mb-4">
+                    <div class="service-card card h-100">
+                        <img src="~/content/images/posts/1.jpg" class="card-img-top">
+                        <div class="card-body text-center">
+                            <h6 class="title">
+                                <i class="fas fa-shield-alt me-2"></i>Đảm bảo thương mại
+                            </h6>
+                            <p class="small text-muted">Bảo vệ đơn hàng</p>
                         </div>
+                    </div>
+                </div>
+                <div class="col-md-3 col-sm-6 mb-4">
+                    <div class="service-card card h-100">
+                        <img src="~/content/images/posts/2.jpg" class="card-img-top">
+                        <div class="card-body text-center">
+                            <h6 class="title">
+                                <i class="fas fa-credit-card me-2"></i>Thanh toán bất cứ lúc nào
+                            </h6>
+                            <p class="small text-muted">Giải pháp tài chính</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 col-sm-6 mb-4">
+                    <div class="service-card card h-100">
+                        <img src="~/content/images/posts/3.jpg" class="card-img-top">
+                        <div class="card-body text-center">
+                            <h6 class="title">
+                                <i class="fas fa-search me-2"></i>Giải pháp kiểm tra
+                            </h6>
+                            <p class="small text-muted">Kiểm tra dễ dàng</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 col-sm-6 mb-4">
+                    <div class="service-card card h-100">
+                        <img src="~/content/images/posts/4.jpg" class="card-img-top">
+                        <div class="card-body text-center">
+                            <h6 class="title">
+                                <i class="fas fa-plane me-2"></i>Vận chuyển đường hàng không
+                            </h6>
+                            <p class="small text-muted">Dịch vụ hậu cần</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
 
-                    </div> <!-- col // -->
-                </div> <!-- row // -->
-            </section>
+        <!-- Advertisement Banner -->
+        <section class="mb-5">
+            <div class="text-center">
+                <img src="~/content/images/banners/ad-sm.png" class="img-fluid rounded-3 shadow-sm" style="max-height: 200px; width: 100%; object-fit: cover;">
+            </div>
+        </section>
 
-            <!-- =============== SECTION REQUEST .//END =============== -->
-            <!-- =============== SECTION ITEMS =============== -->
-            <section class="padding-bottom-sm">
-
-                <header class="section-heading heading-line">
-                    <h4 class="title-section text-uppercase">Sản phẩm đề xuất</h4>
-                </header>
-
-                <div class="row row-sm">
-                    @foreach (var item in Model.ListProduct.Where(n => n.TypeId == 1))
-                    {
-                        <div class="col-xl-2 col-lg-3 col-md-4 col-6">
-                            <div href="#" class="card card-sm card-product-grid">
-                                <a href="@Url.Action("Detail", "Product", new {Id=item.Id})" class="img-wrap"> <img src="~/content/images/items/@item.Image"> </a>
-                                <figcaption class="info-wrap">
-                                    @Html.ActionLink(item.Name, "Detail", "Product", new { Id = item.Id }, null)
-                                    <div class="price mt-1">@item.Price</div> <!-- price-wrap.// -->
-                                </figcaption>
-                            </div>
-                        </div> <!-- col.// -->
-                    }
-
-
-                </div> <!-- row.// -->
-            </section>
-            <!-- =============== SECTION ITEMS .//END =============== -->
-            <!-- =============== SECTION SERVICES =============== -->
-            <section class="padding-bottom">
-
-                <header class="section-heading heading-line">
-                    <h4 class="title-section text-uppercase">Dịch vụ thương mại</h4>
-                </header>
-
-                <div class="row">
-                    <div class="col-md-3 col-sm-6">
-                        <article class="card card-post">
-                            <img src="~/content/images/posts/1.jpg" class="card-img-top">
-                            <div class="card-body">
-                                <h6 class="title">Đảm bảo thương mại</h6>
-                                <p class="small text-uppercase text-muted">
-                                    Bảo vệ đơn hàng
-                                </p>
-                            </div>
-                        </article> <!-- card.// -->
-                    </div> <!-- col.// -->
-                    <div class="col-md-3 col-sm-6">
-                        <article class="card card-post">
-                            <img src="~/content/images/posts/2.jpg" class="card-img-top">
-                            <div class="card-body">
-                                <h6 class="title">Thanh toán bất cứ lúc nào</h6>
-                                <p class="small text-uppercase text-muted">Giải pháp tài chính</p>
-                            </div>
-                        </article> <!-- card.// -->
-                    </div> <!-- col.// -->
-                    <div class="col-md-3 col-sm-6">
-                        <article class="card card-post">
-                            <img src="~/content/images/posts/3.jpg" class="card-img-top">
-                            <div class="card-body">
-                                <h6 class="title">Giải pháp kiểm tra</h6>
-                                <p class="small text-uppercase text-muted">Kiểm tra dễ dàng</p>
-                            </div>
-                        </article> <!-- card.// -->
-                    </div> <!-- col.// -->
-                    <div class="col-md-3 col-sm-6">
-                        <article class="card card-post">
-                            <img src="~/content/images/posts/4.jpg" class="card-img-top">
-                            <div class="card-body">
-                                <h6 class="title">
-                                    Vận chuyển đường hàng không
-                                </h6>
-                                <p class="small text-uppercase text-muted">Dịch vụ hậu cần</p>
-                            </div>
-                        </article> <!-- card.// -->
-                    </div> <!-- col.// -->
-                </div> <!-- row.// -->
-
-            </section>
-            <!-- =============== SECTION SERVICES .//END =============== -->
-            <!-- =============== SECTION REGION =============== -->
-            <section class="padding-bottom">
-
-                <header class="section-heading heading-line">
-                    <h4 class="title-section text-uppercase">Chọn vùng</h4>
-                </header>
-
-                <ul class="row mt-4">
-                    <li class="col-md col-6"><a href="#" class="icontext"> <img class="icon-flag-sm" src="~/content/images/icons/flags/CN.png"> <span>China</span> </a></li>
-                    <li class="col-md col-6"><a href="#" class="icontext"> <img class="icon-flag-sm" src="~/content/images/icons/flags/DE.png"> <span>Germany</span> </a></li>
-                    <li class="col-md col-6"><a href="#" class="icontext"> <img class="icon-flag-sm" src="~/content/images/icons/flags/AU.png"> <span>Australia</span> </a></li>
-                    <li class="col-md col-6"><a href="#" class="icontext"> <img class="icon-flag-sm" src="~/content/images/icons/flags/RU.png"> <span>Russia</span> </a></li>
-                    <li class="col-md col-6"><a href="#" class="icontext"> <img class="icon-flag-sm" src="~/content/images/icons/flags/IN.png"> <span>India</span> </a></li>
-                    <li class="col-md col-6"><a href="#" class="icontext"> <img class="icon-flag-sm" src="~/content/images/icons/flags/GB.png"> <span>England</span> </a></li>
-                    <li class="col-md col-6"><a href="#" class="icontext"> <img class="icon-flag-sm" src="~/content/images/icons/flags/TR.png"> <span>Turkey</span> </a></li>
-                    <li class="col-md col-6"><a href="#" class="icontext"> <img class="icon-flag-sm" src="~/content/images/icons/flags/UZ.png"> <span>Uzbekistan</span> </a></li>
-                    <li class="col-md col-6"><a href="#" class="icontext"> <i class="mr-3 fa fa-ellipsis-h"></i> <span>More regions</span> </a></li>
-                </ul>
-            </section>
-            <!-- =============== SECTION REGION .//END =============== -->
-
-            <article class="my-4">
-                <img src="~/content/images/banners/ad-sm.png" class="w-100">
-            </article>
-        </div>
+    </div>
     <!-- container end.// -->
+    <!-- JavaScript Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet">
 
+    <script>
+        // Countdown Timer
+        function startCountdown() {
+            const countDate = new Date();
+            countDate.setDate(countDate.getDate() + 7); // 7 days from now
 
+            function updateTimer() {
+                const now = new Date().getTime();
+                const distance = countDate - now;
+
+                const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+                document.getElementById('days').textContent = days.toString().padStart(2, '0');
+                document.getElementById('hours').textContent = hours.toString().padStart(2, '0');
+                document.getElementById('minutes').textContent = minutes.toString().padStart(2, '0');
+                document.getElementById('seconds').textContent = seconds.toString().padStart(2, '0');
+
+                if (distance < 0) {
+                    clearInterval(timer);
+                    document.getElementById('days').textContent = '00';
+                    document.getElementById('hours').textContent = '00';
+                    document.getElementById('minutes').textContent = '00';
+                    document.getElementById('seconds').textContent = '00';
+                }
+            }
+
+            updateTimer();
+            const timer = setInterval(updateTimer, 1000);
+        }
+
+        // Initialize when page loads
+        $(document).ready(function () {
+            startCountdown();
+
+            // Add smooth scrolling
+            $('a[href^="#"]').on('click', function (event) {
+                var target = $(this.getAttribute('href'));
+                if (target.length) {
+                    event.preventDefault();
+                    $('html, body').stop().animate({
+                        scrollTop: target.offset().top - 80
+                    }, 1000);
+                }
+            });
+
+            // Add loading animation to cards
+            $('.product-card').each(function (index) {
+                $(this).delay(index * 100).queue(function (next) {
+                    $(this).addClass('fade-in');
+                    next();
+                });
+            });
+
+            // Configure toastr
+            toastr.options = {
+                "closeButton": true,
+                "progressBar": true,
+                "positionClass": "toast-top-right",
+                "timeOut": "3000"
+            };
+        });
+
+        // Add to cart animation
+        $(document).on("click", ".addtocart", function () {
+            const button = $(this);
+            const originalText = button.html();
+
+            // Show loading state
+            button.html('<i class="fas fa-spinner fa-spin me-2"></i>Đang thêm...');
+            button.prop('disabled', true);
+
+            var model = {
+                Id: $(this).data("id"),
+                Quantity: 1
+            };
+
+            $.ajax({
+                type: "POST",
+                url: '/Cart/AddToCart',
+                data: JSON.stringify(model),
+                dataType: "json",
+                contentType: "application/json; charset=utf-8",
+                success: function () {
+                    toastr.success("Đã thêm vào giỏ hàng!", "Thành công");
+                    let count = parseInt($('#CartCount').text()) + 1;
+                    $('#CartCount').text(count);
+
+                    // Success animation
+                    button.html('<i class="fas fa-check me-2"></i>Đã thêm!');
+                    button.removeClass('addtocart').addClass('btn-success');
+
+                    setTimeout(function () {
+                        button.html(originalText);
+                        button.removeClass('btn-success').addClass('addtocart');
+                        button.prop('disabled', false);
+                    }, 2000);
+                },
+                error: function () {
+                    toastr.error("Không thể thêm vào giỏ!", "Lỗi");
+                    button.html(originalText);
+                    button.prop('disabled', false);
+                }
+            });
+
+            return false;
+        });
+
+        // Lazy loading for images
+        if ('IntersectionObserver' in window) {
+            const imageObserver = new IntersectionObserver((entries, observer) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const img = entry.target;
+                        img.src = img.dataset.src;
+                        img.classList.remove('lazy');
+                        imageObserver.unobserve(img);
+                    }
+                });
+            });
+
+            document.querySelectorAll('img[data-src]').forEach(img => {
+                imageObserver.observe(img);
+            });
+        }
+    </script>
 
 </body>
 </html>

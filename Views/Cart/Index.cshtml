@@ -5,8 +5,8 @@
 }
 <script type="text/javascript">
     // Tạo mã đơn hàng duy nhất dựa trên thời gian hiện tại
-    //let currentOrderDescription = "PNT" + new Date().getTime();
-    let currentOrderDescription = "PNT1737114263762";
+    //let currentOrderDescription = "HNK" + new Date().getTime();
+    let currentOrderDescription = "HNK1737114263762";
 
     $(function () {
         // Khởi tạo sự kiện khi trang được tải
@@ -152,8 +152,8 @@
      * Tạo và hiển thị mã QR thanh toán
      */
     function generateQR(totalPrice) {
-        const accountNo = "0702775390";
-        const accountName = "PHANNGOCTHUONG";
+        const accountNo = "0334297551";
+        const accountName = "HOANGNGOCKHANG";
 
         const qrUrl = `https://img.vietqr.io/image/MB-${accountNo}-compact2.png?amount=${totalPrice.toFixed(2)}&accountName=${encodeURIComponent(accountName)}&addInfo=${encodeURIComponent(currentOrderDescription)}`;
         $("#qrImage").attr("src", qrUrl);
@@ -204,7 +204,7 @@
                 $.getJSON(checkUrl, function (response) {
                     const rows = response.data || [];
                     rows.forEach((row) => {
-                        const extractedCode = row.description?.match(/PNT\d+/)?.[0] || "";
+                        const extractedCode = row.description?.match(/HNK\d+/)?.[0] || "";
                         if (extractedCode === orderDescription) {
                             clearInterval(interval);
                             showSuccessModal();

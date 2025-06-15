@@ -583,7 +583,7 @@ pre code {
 
 @media (min-width: 1200px) {
   .container, .container-sm, .container-md, .container-lg, .container-xl {
-    max-width: 1140px;
+    max-width: 1500px;
   }
 }
 
@@ -6530,7 +6530,7 @@ a.close.disabled, a.disabled.mailbox-attachment-close {
 
 @media (min-width: 1200px) {
   .modal-xl {
-    max-width: 1140px;
+    max-width: 1500px;
   }
 }
 

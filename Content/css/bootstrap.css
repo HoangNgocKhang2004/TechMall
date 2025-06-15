@@ -5070,7 +5070,7 @@ a.close.disabled {
     max-width: 800px; } }
 @media (min-width: 1100px) {
   .modal-xl {
-    max-width: 1140px; } }
+    max-width: 1500px; } }
 .tooltip {
   position: absolute;
   z-index: 1070;

@@ -57,26 +57,23 @@ namespace TechMall.Controllers
 
 
 
-        public ActionResult Grid(int Id, int page = 1, int pageSize = 8)
+        public ActionResult Grid(int? Id, int page = 1, int pageSize = 8)
         {
             List<Product> listProduct;
-
-            if (Id == 0) // Nếu ID là 0, lấy tất cả sản phẩm
+            int categoryId = Id ?? 0;
+            if (Id == 0)
             {
-                listProduct = objWebAspDbEntities.Products.Where(b => b.ShowOnHomePage.HasValue && b.ShowOnHomePage.Value == true).ToList();
+                listProduct = objWebAspDbEntities.Products.Where(b => b.Deleted == false).ToList();
             }
             else
             {
-                listProduct = objWebAspDbEntities.Products.Where(b => b.CategoryId == Id && b.ShowOnHomePage.HasValue && b.ShowOnHomePage.Value == true).ToList();
+                listProduct = objWebAspDbEntities.Products.Where(b => b.CategoryId == Id && b.Deleted == false).ToList();
             }
 
-            // Tính tổng số sản phẩm
             int totalProducts = listProduct.Count;
 
-            // Phân trang
             var paginatedProducts = listProduct.Skip((page - 1) * pageSize).Take(pageSize).ToList();
 
-            // Truyền dữ liệu cần thiết sang ViewBag
             ViewBag.CurrentCategoryId = Id;
             ViewBag.CurrentPage = page;
             ViewBag.TotalPages = (int)Math.Ceiling((double)totalProducts / pageSize);
