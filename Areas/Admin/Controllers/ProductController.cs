@@ -14,6 +14,9 @@ using iTextSharp.text.pdf;
 using TechMall.Models;
 using System.Data.Entity;
 using PagedList;
+using Newtonsoft.Json;
+using System.Net.Http;
+using System.Threading.Tasks;
 
 namespace TechMall.Areas.Admin.Controllers
 {
@@ -51,25 +54,35 @@ namespace TechMall.Areas.Admin.Controllers
 
         //    return View(listProduct);
         //}
-        public ActionResult ListProduct(int? page)
+        public async Task<ActionResult> ListProduct(int? page)
         {
-            int pageSize = 5; // Số sản phẩm mỗi trang
-            int pageNumber = (page ?? 1); // Trang hiện tại, mặc định là 1
+            int pageSize = 5;
+            int pageNumber = page ?? 1;
+            List<ProductViewModel> products = new List<ProductViewModel>();
 
-            // Truy vấn dữ liệu trực tiếp từ database với các điều kiện
-            var listProduct = _context.Products
-                .Where(p => p.Deleted.HasValue && p.Deleted.Value == false) // Lọc sản phẩm không bị xóa
-                .OrderByDescending(p => p.Id) // Sắp xếp giảm dần theo ID
-                .ToPagedList(pageNumber, pageSize); // Phân trang
-
-            // Trả về PartialView nếu là AJAX request
-            if (Request.IsAjaxRequest())
+            using (HttpClient client = new HttpClient())
             {
-                return PartialView("_ListProduct", listProduct);
+                client.BaseAddress = new Uri("http://localhost:8080/");
+                HttpResponseMessage response = await client.GetAsync("api/products");
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var json = await response.Content.ReadAsStringAsync();
+                    products = JsonConvert.DeserializeObject<List<ProductViewModel>>(json);
+
+                    // Lọc sản phẩm chưa bị xoá
+                    products = products.Where(p => !p.Deleted).OrderByDescending(p => p.Id).ToList();
+                }
             }
 
-            // Trả về View cho non-AJAX request
-            return View(listProduct);
+            var pagedList = products.ToPagedList(pageNumber, pageSize);
+
+            if (Request.IsAjaxRequest())
+            {
+                return PartialView("_ListProduct", pagedList);
+            }
+
+            return View(pagedList);
         }
 
         [HttpGet]
@@ -357,16 +370,16 @@ namespace TechMall.Areas.Admin.Controllers
             {
                 Id = product.Id,
                 Name = product.Name,
-                CategoryId = product.CategoryId,
-                BrandId = product.BrandId,
+                //CategoryId = product.CategoryId,
+                //BrandId = product.BrandId,
                 Image = product.Image,
                 ShortDes = product.ShortDes,
                 FullDescription = product.FullDescription,
                 Price = Convert.ToDecimal(product.Price), // Chuyển đổi từ double sang decimal
                 PriceDiscount = product.PriceDiscount.HasValue ? Convert.ToDecimal(product.PriceDiscount) : (decimal?)null, // Chuyển đổi với kiểu nullable
                 ShowOnHomePage = product.ShowOnHomePage ?? false,
-                Slug = product.Slug,
-                TypeId = product.TypeId,
+                //Slug = product.Slug,
+                //TypeId = product.TypeId,
                 CreatedAt = product.CreatedAt,
                 UpdatedAt = product.UpdatedAt,
                 Categories = _context.Categories.Select(c => new SelectListItem
@@ -454,15 +467,15 @@ namespace TechMall.Areas.Admin.Controllers
             {
                 Id = product.Id,
                 Name = product.Name,
-                CategoryId = product.CategoryId,
-                BrandId = product.BrandId,
+                //CategoryId = product.CategoryId,
+                //BrandId = product.BrandId,
                 Image = product.Image,
                 ShortDes = product.ShortDes,
                 FullDescription = product.FullDescription,
                 Price = Convert.ToDecimal(product.Price), // Chuyển đổi từ double sang decimal
                 PriceDiscount = product.PriceDiscount.HasValue ? Convert.ToDecimal(product.PriceDiscount) : (decimal?)null, // Chuyển đổi với kiểu nullable
-                ShowOnHomePage = product.ShowOnHomePage,
-                Slug = product.Slug,
+                //ShowOnHomePage = product.ShowOnHomePage,
+                //Slug = product.Slug,
                 CreatedAt = product.CreatedAt,
                 UpdatedAt = product.UpdatedAt,
                 // Thêm tên danh mục và thương hiệu vào ViewModel

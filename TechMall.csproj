@@ -2646,6 +2646,7 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Helpers\ApiHelper.cs" />
     <Compile Include="Helpers\SessionExtensions.cs" />
     <Compile Include="Models\CartModel.cs" />
     <Compile Include="Models\FirebaseUserModel.cs" />
@@ -2692,6 +2693,7 @@
   <ItemGroup>
     <Folder Include="App_Data\" />
     <Folder Include="Areas\Admin\Data\" />
+    <Folder Include="Areas\Admin\Models\" />
   </ItemGroup>
   <ItemGroup>
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />

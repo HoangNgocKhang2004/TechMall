@@ -467,8 +467,9 @@
                                     <li><a href="/Home/Grid/0"><i class="fas fa-th-large me-2"></i>Tất cả</a></li>
                                     @foreach (var item in Model.ListCategory.Take(8))
                                     {
-                                        <li>@Html.ActionLink(item.Name, "Grid", "Home", new { @Id = item.Id }, new { @class = "category-link" })</li>
+                                        <li>@Html.ActionLink(item.Name, "Grid", "Home", new { categoryName = item.Name }, new { @class = "category-link" })</li>
                                     }
+
                                 </ul>
                             </nav>
                         </aside>
@@ -512,9 +513,10 @@
                                     <div class="card-banner">
                                         <div style="flex: 1;">
                                             <h6 class="card-title mb-2">@item.Name</h6>
-                                            <a href="@Url.Action("Grid", "Home", new { @Id = item.Id })" class="btn btn-primary btn-sm">
+                                            <a href="@Url.Action("Grid", "Home", new { categoryName = item.Name })" class="btn btn-primary btn-sm">
                                                 <i class="fas fa-shopping-cart me-1"></i>Mua ngay
                                             </a>
+
                                         </div>
                                         <img src="~/content/images/items/@item.Image" height="60" class="rounded">
                                     </div>
@@ -525,62 +527,12 @@
                 </div>
             </main>
         </section>
-        <!-- Deal Section -->
-        <section class="deal-section">
-            <div class="deal-content">
-                <div class="row align-items-center">
-                    <div class="col-md-6">
-                        <h3 class="fw-bold mb-3">
-                            <i class="fas fa-bolt me-2"></i>Siêu giảm giá
-                        </h3>
-                        <p class="mb-3">Thiết bị di động - Giá sốc trong thời gian có hạn!</p>
-                        <div class="timer">
-                            <div>
-                                <span class="num" id="days">00</span>
-                                <small>Ngày</small>
-                            </div>
-                            <div>
-                                <span class="num" id="hours">00</span>
-                                <small>Giờ</small>
-                            </div>
-                            <div>
-                                <span class="num" id="minutes">00</span>
-                                <small>Phút</small>
-                            </div>
-                            <div>
-                                <span class="num" id="seconds">00</span>
-                                <small>Giây</small>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="row">
-                            @foreach (var item in Model.ListProduct.Where(n => n.TypeId == 2).Take(4))
-                            {
-                                <div class="col-6 mb-3">
-                                    <div class="product-card card">
-                                        <a href="@Url.Action("Detail", "Product", new {Id=item.Id})" class="img-wrap d-flex align-items-center justify-content-center p-2" style="height: 120px;">
-                                            <img src="~/content/images/items/@item.Image" alt="@item.Name" style="max-height: 100%; max-width: 100%; object-fit: contain;">
-                                        </a>
-                                        <div class="card-body p-2">
-                                            <h6 class="card-title small">
-                                                @Html.ActionLink(item.Name, "Detail", "Product", new { Id = item.Id }, new { @class = "text-decoration-none" })
-                                            </h6>
-                                            <span class="badge bg-danger">-20%</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            }
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
+
         <!-- Category Products Section -->
         @foreach (var category in Model.ListCategory)
         {
             var products = Model.ListProduct
-                .Where(p => p.CategoryId == category.Id && !(p.Deleted ?? false))
+                .Where(p => p.CategoryName == category.Name && !p.Deleted)
                 .Take(6)
                 .ToList();
 
@@ -625,37 +577,6 @@
                 </section>
             }
         }
-
-
-        <!-- Recommended Products -->
-        <section class="mb-5 fade-in">
-            <header class="section-header">
-                <h3 class="section-title">Sản phẩm đề xuất</h3>
-                <div class="badge bg-primary">Đặc biệt</div>
-            </header>
-
-            <div class="row">
-                @foreach (var item in Model.ListProduct.Where(n => n.TypeId == 1))
-                {
-                    <div class="col-xl-2 col-lg-3 col-md-4 col-6 mb-4">
-                        <div class="product-card card h-100">
-                            <a href="@Url.Action("Detail", "Product", new {Id=item.Id})" class="img-wrap d-flex align-items-center justify-content-center p-3">
-                                <img src="~/content/images/items/@item.Image" alt="@item.Name" style="max-height: 100%; max-width: 100%; object-fit: contain;">
-                            </a>
-                            <div class="card-body">
-                                <h6 class="card-title">
-                                    @Html.ActionLink(item.Name, "Detail", "Product", new { Id = item.Id }, new { @class = "text-decoration-none" })
-                                </h6>
-                                <div class="product-price">@String.Format("{0:N0}", item.Price) đ</div>
-                                <button class="addtocart" data-id="@item.Id">
-                                    <i class="fas fa-cart-plus me-2"></i>Thêm vào giỏ
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                }
-            </div>
-        </section>
 
         <!-- Quote Request Section -->
         <section class="quote-section">

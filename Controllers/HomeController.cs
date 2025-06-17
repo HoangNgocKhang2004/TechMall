@@ -1,8 +1,11 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using System.Security.Cryptography;
 using System.Text;
+using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
 using TechMall.Context;
@@ -13,18 +16,42 @@ namespace TechMall.Controllers
     public class HomeController : Controller
     {
         WebAspDbEntities objWebAspDbEntities = new WebAspDbEntities();
-        public ActionResult Index()
+        public async Task<ActionResult> Index()
         {
-            HomeModel objHomeModel = new HomeModel();
-            objHomeModel.ListCategory = objWebAspDbEntities.Categories.Where(c => c.ShowOnHomePage.HasValue && c.ShowOnHomePage.Value == true).ToList();
-            objHomeModel.ListProduct = objWebAspDbEntities.Products.Where(p => p.ShowOnHomePage.HasValue && p.ShowOnHomePage.Value == true).ToList();
-            objHomeModel.ListBrand = objWebAspDbEntities.Brands.Where(b => b.ShowOnHomePage.HasValue && b.ShowOnHomePage.Value == true).ToList();
+            var model = new HomeModel
+            {
+                ListProduct = new List<ProductViewModel>(),
+                ListCategory = new List<Category>(),
+                ListBrand = new List<Brand>()
+            };
 
-            // Truyền dữ liệu vào ViewBag
-            //ViewBag.ListCategory = objHomeModel.ListCategory;
-            //ViewBag.ListProduct = objHomeModel.ListProduct;
+            using (HttpClient client = new HttpClient())
+            {
+                client.BaseAddress = new Uri("http://localhost:8080/");
 
-            return View(objHomeModel);
+                var productRes = await client.GetAsync("api/products");
+                if (productRes.IsSuccessStatusCode)
+                {
+                    string json = await productRes.Content.ReadAsStringAsync();
+                    model.ListProduct = JsonConvert.DeserializeObject<List<ProductViewModel>>(json);
+                }
+
+                var cateRes = await client.GetAsync("api/categories");
+                if (cateRes.IsSuccessStatusCode)
+                {
+                    string json = await cateRes.Content.ReadAsStringAsync();
+                    model.ListCategory = JsonConvert.DeserializeObject<List<Category>>(json);
+                }
+
+                var brandRes = await client.GetAsync("api/brands");
+                if (brandRes.IsSuccessStatusCode)
+                {
+                    string json = await brandRes.Content.ReadAsStringAsync();
+                    model.ListBrand = JsonConvert.DeserializeObject<List<Brand>>(json);
+                }
+            }
+
+            return View("Index", model); // RÕ RÀNG là View Index + Model HomeModel
         }
 
         public ActionResult Large(int Id, int page = 1, int pageSize = 6)
@@ -56,32 +83,58 @@ namespace TechMall.Controllers
         }
 
 
-
-        public ActionResult Grid(int? Id, int page = 1, int pageSize = 8)
+        public async Task<ActionResult> Grid(string categoryName, int page = 1, int pageSize = 8)
         {
-            List<Product> listProduct;
-            int categoryId = Id ?? 0;
-            if (Id == 0)
+            List<ProductViewModel> allProducts = new List<ProductViewModel>();
+
+            using (HttpClient client = new HttpClient())
             {
-                listProduct = objWebAspDbEntities.Products.Where(b => b.Deleted == false).ToList();
+                client.BaseAddress = new Uri("http://localhost:8080/");
+                HttpResponseMessage response = await client.GetAsync("api/products");
+
+                if (response.IsSuccessStatusCode)
+                {
+                    string json = await response.Content.ReadAsStringAsync();
+                    allProducts = JsonConvert.DeserializeObject<List<ProductViewModel>>(json);
+
+                    // Gán mặc định
+                    foreach (var p in allProducts)
+                    {
+                        p.Deleted = p?.Deleted ?? false;
+                        p.ShowOnHomePage = p?.ShowOnHomePage ?? false;
+                        p.CategoryName = p.CategoryName ?? "";
+                        p.BrandName = p.BrandName ?? "";
+                        p.Image = p.Image ?? "";
+                        p.ShortDes = p.ShortDes ?? "";
+                        p.FullDescription = p.FullDescription ?? "";
+                    }
+
+                    // Lọc theo tên danh mục nếu có
+                    if (!string.IsNullOrEmpty(categoryName))
+                    {
+                        allProducts = allProducts
+                            .Where(p => string.Equals(p.CategoryName, categoryName, StringComparison.OrdinalIgnoreCase))
+                            .ToList();
+                    }
+
+                    // Lọc sản phẩm chưa bị xóa
+                    allProducts = allProducts.Where(p => !p.Deleted).ToList();
+                }
             }
-            else
-            {
-                listProduct = objWebAspDbEntities.Products.Where(b => b.CategoryId == Id && b.Deleted == false).ToList();
-            }
 
-            int totalProducts = listProduct.Count;
+            int totalProducts = allProducts.Count;
+            var paginatedProducts = allProducts
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToList();
 
-            var paginatedProducts = listProduct.Skip((page - 1) * pageSize).Take(pageSize).ToList();
-
-            ViewBag.CurrentCategoryId = Id;
+            ViewBag.CurrentCategoryId = categoryName;
             ViewBag.CurrentPage = page;
             ViewBag.TotalPages = (int)Math.Ceiling((double)totalProducts / pageSize);
             ViewBag.PageSize = pageSize;
 
-            return View(paginatedProducts);
+            return View(paginatedProducts); // View dùng @model List<ProductViewModel>
         }
-
 
 
         //GET: Register
