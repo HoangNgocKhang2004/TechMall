@@ -1,84 +1,76 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
+﻿using System.Net.Http;
+using System.Threading.Tasks;
 using System.Web.Mvc;
-using TechMall.Context;
-using TechMall.Models;
+using Newtonsoft.Json;
+using System.Collections.Generic;
+using System.Text;
+using TechMall.Models.ViewModels;
 
 namespace TechMall.Controllers
 {
     public class OrderController : Controller
     {
-        WebAspDbEntities db = new WebAspDbEntities();
+        private readonly string apiBaseUrl = "http://localhost:8080/api/";
 
-        // GET: Order
-        public ActionResult Index()
+        public async Task<ActionResult> Index()
         {
-            // Kiểm tra xem user đã đăng nhập hay chưa
             if (Session["idUser"] == null)
             {
                 return RedirectToAction("Login", "Home");
             }
 
-            // Lấy ID user từ session
             int userId = (int)Session["idUser"];
+            List<OrderVM> orders = new List<OrderVM>();
 
-            // Lấy danh sách đơn hàng của user
-            var orders = db.Orders.Where(o => o.UserId == userId).ToList();
+            using (var client = new HttpClient())
+            {
+                var response = await client.GetAsync(apiBaseUrl + $"orders/user/{userId}");
+                if (response.IsSuccessStatusCode)
+                {
+                    var json = await response.Content.ReadAsStringAsync();
+                    orders = JsonConvert.DeserializeObject<List<OrderVM>>(json);
+                }
+            }
 
-            // Lưu số lượng đơn hàng vào session
             Session["odercount"] = orders.Count;
-
             return View(orders);
         }
 
-        private readonly WebAspDbEntities _context;
-
-        // Constructor
-        public OrderController()
-        {
-            _context = new WebAspDbEntities(); // Khởi tạo đối tượng DbContext
-        }
         [HttpGet]
-        public ActionResult GetOrderDetails(int id)
+        public async Task<ActionResult> GetOrderDetails(int id)
         {
-            try
+            using (var client = new HttpClient())
             {
-                var orderDetails = _context.OrderDetails
-                                           .Where(od => od.OrderId == id)
-                                           .Select(od => new OrderDetailDTO
-                                           {
-                                               ProductId = od.ProductId,
-                                               Quantity = od.Quantity,
-                                               Price = od.Price,
-                                               TotalPrice = od.TotalPrice,
-                                               CreatedAt = od.CreatedAt
-                                           })
-                                           .ToList();
-
-                if (!orderDetails.Any())
-                {
+                var response = await client.GetAsync(apiBaseUrl + $"orderdetails/order/{id}");
+                if (!response.IsSuccessStatusCode)
                     return Content("Không tìm thấy chi tiết đơn hàng.");
-                }
+
+                var json = await response.Content.ReadAsStringAsync();
+                var orderDetails = JsonConvert.DeserializeObject<List<OrderDetailVM>>(json);
 
                 return PartialView("_OrderDetailsPartial", orderDetails);
             }
-            catch (Exception ex)
-            {
-                return Content("Lỗi: " + ex.Message);
-            }
         }
+
         [HttpGet]
-        public JsonResult GetOrderCount()
+        public async Task<JsonResult> GetOrderCount()
         {
             if (Session["idUser"] == null)
-            {
                 return Json(new { count = 0 }, JsonRequestBehavior.AllowGet);
-            }
 
             int userId = (int)Session["idUser"];
-            int count = db.Orders.Count(o => o.UserId == userId);
+            int count = 0;
+
+            using (var client = new HttpClient())
+            {
+                var response = await client.GetAsync(apiBaseUrl + $"orders/user/{userId}");
+                if (response.IsSuccessStatusCode)
+                {
+                    var json = await response.Content.ReadAsStringAsync();
+                    var orders = JsonConvert.DeserializeObject<List<OrderVM>>(json);
+                    count = orders.Count;
+                }
+            }
 
             return Json(new { count }, JsonRequestBehavior.AllowGet);
         }

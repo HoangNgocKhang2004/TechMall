@@ -1,4 +1,4 @@
-﻿@model TechMall.Context.User
+﻿@model TechMall.Models.ViewModels.UserVM
 
 @{
     ViewBag.Title = "Register";
@@ -46,22 +46,22 @@
                         <label>City</label>
                         <input type="text" class="form-control">
                     </div>--> <!-- form-group end.// -->
-                    <!--<div class="form-group col-md-6">
-                        <label>Country</label>
-                        <select id="inputState" class="form-control">
-                            <option> Choose...</option>
-                            <option>Uzbekistan</option>
-                            <option>Russia</option>
-                            <option selected="">United States</option>
-                            <option>India</option>
-                            <option>Afganistan</option>
-                        </select>
-                    </div>--> <!-- form-group end.// -->
+                <!--<div class="form-group col-md-6">
+                    <label>Country</label>
+                    <select id="inputState" class="form-control">
+                        <option> Choose...</option>
+                        <option>Uzbekistan</option>
+                        <option>Russia</option>
+                        <option selected="">United States</option>
+                        <option>India</option>
+                        <option>Afganistan</option>
+                    </select>
+                </div>--> <!-- form-group end.// -->
                 <!--</div>--> <!-- form-row.// -->
                 <div class="form-row">
                     <div class="form-group col-md-6">
                         <label>Mật khẩu</label>
-                        <input id="password" name="Password" class="form-control" type="password" />
+                        @Html.PasswordFor(model => model.Password, new { @class = "form-control", id = "password" })
                         @Html.ValidationMessageFor(model => model.Password, "", new { @class = "text-danger" })
                     </div>
                     <div class="form-group col-md-6">

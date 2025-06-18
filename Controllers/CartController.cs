@@ -1,223 +1,193 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Web;
+using System.Net.Http;
+using System.Text;
+using System.Threading.Tasks;
 using System.Web.Mvc;
-using TechMall.Context;
+using Newtonsoft.Json;
 using TechMall.Models;
+using TechMall.Models.ViewModels; // ViewModel chứa ProductVM, OrderVM
 
 namespace TechMall.Controllers
 {
     public class CartController : Controller
     {
-        WebAspDbEntities objWebAspDbEntities = new WebAspDbEntities();
+        private readonly string apiBaseUrl = "http://localhost:8080/api/";
+
         // GET: Cart
         public ActionResult Index()
         {
             return View((List<CartModel>)Session["cart"]);
         }
 
-        public ActionResult AddToCart(int id, int quantity)
+        public async Task<ActionResult> AddToCart(int id, int quantity)
         {
+            ProductVM product = null;
+
+            using (HttpClient client = new HttpClient())
+            {
+                var response = await client.GetAsync(apiBaseUrl + $"products/{id}");
+                if (response.IsSuccessStatusCode)
+                {
+                    var json = await response.Content.ReadAsStringAsync();
+                    product = JsonConvert.DeserializeObject<ProductVM>(json);
+                }
+                else
+                {
+                    return Json(new { Message = "Không tìm thấy sản phẩm" }, JsonRequestBehavior.AllowGet);
+                }
+            }
+
             if (Session["cart"] == null)
             {
-                List<CartModel> cart = new List<CartModel>();
-                cart.Add(new CartModel { Product = objWebAspDbEntities.Products.Find(id), Quantity = quantity });
+                var cart = new List<CartModel> { new CartModel { Product = product, Quantity = quantity } };
                 Session["cart"] = cart;
                 Session["count"] = 1;
             }
             else
             {
-                List<CartModel> cart = (List<CartModel>)Session["cart"];
-                //kiểm tra sản phẩm có tồn tại trong giỏ hàng chưa???
-                int index = isExist(id);
+                var cart = (List<CartModel>)Session["cart"];
+                int index = cart.FindIndex(p => p.Product.Id == id);
                 if (index != -1)
                 {
-                    //nếu sp tồn tại trong giỏ hàng thì cộng thêm số lượng
                     cart[index].Quantity += quantity;
                 }
                 else
                 {
-                    //nếu không tồn tại thì thêm sản phẩm vào giỏ hàng
-                    cart.Add(new CartModel { Product = objWebAspDbEntities.Products.Find(id), Quantity = quantity });
-                    //Tính lại số sản phẩm trong giỏ hàng
+                    cart.Add(new CartModel { Product = product, Quantity = quantity });
                     Session["count"] = Convert.ToInt32(Session["count"]) + 1;
                 }
                 Session["cart"] = cart;
             }
-            return Json(new { Message = "Thành công", JsonRequestBehavior.AllowGet });
+
+            return Json(new { Message = "Thành công" }, JsonRequestBehavior.AllowGet);
         }
 
-        private int isExist(int id)
+        public ActionResult Remove(int id)
         {
-            List<CartModel> cart = (List<CartModel>)Session["cart"];
-            for (int i = 0; i < cart.Count; i++)
-                if (cart[i].Product.Id.Equals(id))
-                    return i;
-            return -1;
-        }
-
-        // Xóa sản phẩm khỏi giỏ hàng theo id
-        public ActionResult Remove(int Id)
-        {
-            try
+            var cart = (List<CartModel>)Session["cart"];
+            if (cart != null)
             {
-                List<CartModel> cart = (List<CartModel>)Session["cart"];
-                if (cart != null)
+                var item = cart.FirstOrDefault(x => x.Product.Id == id);
+                if (item != null)
                 {
-                    // Xóa tất cả sản phẩm có ID trùng
-                    var itemToRemove = cart.FirstOrDefault(x => x.Product.Id == Id);
-                    if (itemToRemove != null)
-                    {
-                        cart.Remove(itemToRemove);
-                        Session["cart"] = cart; // Cập nhật lại giỏ hàng
-                        Session["count"] = cart.Count; // Cập nhật lại số lượng sản phẩm trong giỏ
-                    }
+                    cart.Remove(item);
+                    Session["cart"] = cart;
+                    Session["count"] = cart.Count;
                 }
-                return Json(new { Message = "Xóa sản phẩm thành công", Count = Session["count"] });
             }
-            catch (Exception ex)
-            {
-                return Json(new { Message = "Đã có lỗi xảy ra", Error = ex.Message });
-            }
+            return Json(new { Message = "Xóa sản phẩm thành công", Count = Session["count"] }, JsonRequestBehavior.AllowGet);
         }
+
         public ActionResult GetCartSummary()
         {
-            try
+            var cart = (List<CartModel>)Session["cart"];
+            if (cart == null || cart.Count == 0)
             {
-                List<CartModel> cart = (List<CartModel>)Session["cart"];
-                if (cart == null || cart.Count == 0)
-                {
-                    return Json(new { TotalPrice = 0, Discount = 0, FinalPrice = 0 }, JsonRequestBehavior.AllowGet);
-                }
-
-                // Tính tổng giá của tất cả các sản phẩm trong giỏ
-                var totalPrice = cart.Sum(item => item.Product.Price * item.Quantity);
-
-                // Giảm giá cố định (nếu có)
-                var discount = 0.0; // Giảm giá không cần tính, bạn có thể chỉnh sửa nếu cần
-                var finalPrice = totalPrice - discount;
-
-                // Trả về thông tin giỏ hàng
-                return Json(new
-                {
-                    TotalPrice = totalPrice,
-                    Discount = discount,
-                    FinalPrice = finalPrice
-                }, JsonRequestBehavior.AllowGet);
+                return Json(new { TotalPrice = 0, Discount = 0, FinalPrice = 0 }, JsonRequestBehavior.AllowGet);
             }
-            catch (Exception ex)
+
+            double totalPrice = cart.Sum(x => x.Product.Price * x.Quantity);
+            double discount = 0.0;
+            double finalPrice = totalPrice - discount;
+
+            return Json(new
             {
-                return Json(new { Message = "Có lỗi xảy ra", Error = ex.Message }, JsonRequestBehavior.AllowGet);
-            }
+                TotalPrice = totalPrice,
+                Discount = discount,
+                FinalPrice = finalPrice
+            }, JsonRequestBehavior.AllowGet);
         }
+
         public ActionResult ClearCart()
         {
-            try
-            {
-                // Xóa giỏ hàng
-                Session["cart"] = null;
-                Session["count"] = 0;
-
-                return Json(new { Message = "Giỏ hàng đã được xóa" }, JsonRequestBehavior.AllowGet);
-            }
-            catch (Exception ex)
-            {
-                return Json(new { Message = "Có lỗi xảy ra", Error = ex.Message }, JsonRequestBehavior.AllowGet);
-            }
+            Session["cart"] = null;
+            Session["count"] = 0;
+            return Json(new { Message = "Giỏ hàng đã được xóa" }, JsonRequestBehavior.AllowGet);
         }
+
         [HttpPost]
-        public ActionResult CreatOrder(string currentOrderDescription)
+        public async Task<ActionResult> CreatOrder(string currentOrderDescription)
         {
-            try
+            if (Session["idUser"] == null)
             {
-                // Kiểm tra đăng nhập
-                if (Session["idUser"] == null)
-                {
-                    return RedirectToAction("Login", "Home");
-                }
-
-                // Lấy giỏ hàng từ Session
-                var listCart = (List<CartModel>)Session["cart"];
-                if (listCart == null || listCart.Count == 0)
-                {
-                    return Json(new { Message = "Giỏ hàng trống, không thể tạo đơn hàng" }, JsonRequestBehavior.AllowGet);
-                }
-
-                // Kiểm tra mô tả đơn hàng
-                if (string.IsNullOrEmpty(currentOrderDescription))
-                {
-                    return Json(new { Message = "Mô tả đơn hàng không hợp lệ" }, JsonRequestBehavior.AllowGet);
-                }
-
-                // Tạo đơn hàng mới
-                var objOrder = new Order
-                {
-                    Name = currentOrderDescription,
-                    UserId = int.Parse(Session["idUser"].ToString()),
-                    CreatedAt = DateTime.Now,
-                    Status = 1 // Đơn hàng mới
-                };
-
-                objWebAspDbEntities.Orders.Add(objOrder);
-                objWebAspDbEntities.SaveChanges();
-
-                // Lấy ID của đơn hàng vừa tạo
-                int orderId = objOrder.Id;
-
-
-                // Tạo danh sách OrderDetail
-                var orderDetails = listCart.Select(item => new OrderDetail
-                {
-                    OrderId = orderId,
-                    ProductId = item.Product.Id,
-                    UserId = int.Parse(Session["idUser"].ToString()),
-                    Quantity = item.Quantity,
-                    Price = item.Product.Price,
-                    TotalPrice = item.Product.Price * item.Quantity,
-                    CreatedAt = DateTime.Now
-                }).ToList();
-
-                objWebAspDbEntities.OrderDetails.AddRange(orderDetails);
-                objWebAspDbEntities.SaveChanges();
-
-                // Xóa giỏ hàng sau khi lưu thành công
-                Session["cart"] = null;
-                Session["count"] = 0;
-
-                return Json(new { Message = "Đơn hàng được tạo thành công", OrderId = orderId }, JsonRequestBehavior.AllowGet);
+                return RedirectToAction("Login", "Home");
             }
-            catch (Exception ex)
+
+            var listCart = (List<CartModel>)Session["cart"];
+            if (listCart == null || listCart.Count == 0)
             {
-                return Json(new { Message = "Có lỗi xảy ra", Error = ex.Message }, JsonRequestBehavior.AllowGet);
+                return Json(new { Message = "Giỏ hàng trống" }, JsonRequestBehavior.AllowGet);
             }
+
+            if (string.IsNullOrEmpty(currentOrderDescription))
+            {
+                return Json(new { Message = "Mô tả đơn hàng không hợp lệ" }, JsonRequestBehavior.AllowGet);
+            }
+
+            int userId = int.Parse(Session["idUser"].ToString());
+
+            var order = new
+            {
+                Name = currentOrderDescription,
+                UserId = userId,
+                CreatedAt = DateTime.Now,
+                Status = 1
+            };
+
+            int orderId;
+            using (HttpClient client = new HttpClient())
+            {
+                var content = new StringContent(JsonConvert.SerializeObject(order), Encoding.UTF8, "application/json");
+                var response = await client.PostAsync(apiBaseUrl + "orders", content);
+                if (!response.IsSuccessStatusCode)
+                {
+                    return Json(new { Message = "Tạo đơn hàng thất bại" }, JsonRequestBehavior.AllowGet);
+                }
+
+                var orderJson = await response.Content.ReadAsStringAsync();
+                var orderCreated = JsonConvert.DeserializeObject<OrderVM>(orderJson);
+                orderId = orderCreated.Id;
+
+                foreach (var item in listCart)
+                {
+                    var detail = new
+                    {
+                        OrderId = orderId,
+                        ProductId = item.Product.Id,
+                        UserId = userId,
+                        Quantity = item.Quantity,
+                        Price = item.Product.Price,
+                        TotalPrice = item.Product.Price * item.Quantity,
+                        CreatedAt = DateTime.Now
+                    };
+
+                    var detailContent = new StringContent(JsonConvert.SerializeObject(detail), Encoding.UTF8, "application/json");
+                    await client.PostAsync(apiBaseUrl + "orderdetails", detailContent);
+                }
+            }
+
+            Session["cart"] = null;
+            Session["count"] = 0;
+
+            return Json(new { Message = "Đơn hàng tạo thành công", OrderId = orderId }, JsonRequestBehavior.AllowGet);
         }
+
         [HttpPost]
         public JsonResult UpdateQuantity(int id, int quantity)
         {
-            try
+            var cart = Session["cart"] as List<CartModel>;
+            var item = cart?.FirstOrDefault(x => x.Product.Id == id);
+
+            if (item != null)
             {
-                var cart = Session["Cart"] as List<CartModel>;
-                var item = cart?.FirstOrDefault(x => x.Product.Id == id);
-
-                if (item != null)
-                {
-                    item.Quantity = quantity; // Cập nhật số lượng sản phẩm
-
-                    // Lưu giỏ hàng vào session sau khi cập nhật số lượng
-                    Session["Cart"] = cart;
-
-                    return Json(new { Success = true });
-                }
-
-                return Json(new { Success = false, Message = "Sản phẩm không tồn tại trong giỏ hàng." });
+                item.Quantity = quantity;
+                Session["cart"] = cart;
+                return Json(new { Success = true });
             }
-            catch (Exception ex)
-            {
-                return Json(new { Success = false, Message = "Lỗi: " + ex.Message });
-            }
+
+            return Json(new { Success = false, Message = "Sản phẩm không tồn tại trong giỏ hàng." });
         }
-
-
     }
 }

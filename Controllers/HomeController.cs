@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
@@ -10,12 +11,23 @@ using System.Web;
 using System.Web.Mvc;
 using TechMall.Context;
 using TechMall.Models;
+using TechMall.Models.ViewModels;
 
 namespace TechMall.Controllers
 {
     public class HomeController : Controller
     {
-        WebAspDbEntities objWebAspDbEntities = new WebAspDbEntities();
+        private readonly string apiBaseUrl = "http://localhost:8080/api/";
+        private readonly HttpClient _httpClient;
+
+        public HomeController()
+        {
+            _httpClient = new HttpClient
+            {
+                BaseAddress = new Uri("http://localhost:8080") // Thay bằng API URL thật sự
+            };
+        }
+        //WebAspDbEntities objWebAspDbEntities = new WebAspDbEntities();
         public async Task<ActionResult> Index()
         {
             var model = new HomeModel
@@ -54,26 +66,34 @@ namespace TechMall.Controllers
             return View("Index", model); // RÕ RÀNG là View Index + Model HomeModel
         }
 
-        public ActionResult Large(int Id, int page = 1, int pageSize = 6)
+        public async Task<ActionResult> Large(int Id, int page = 1, int pageSize = 6)
         {
-            List<Product> listProduct;
+            var response = await _httpClient.GetAsync("/api/products");
 
-            if (Id == 0) // Nếu ID là 0, lấy tất cả sản phẩm
+            if (!response.IsSuccessStatusCode)
             {
-                listProduct = objWebAspDbEntities.Products.Where(b => b.ShowOnHomePage.HasValue && b.ShowOnHomePage.Value == true).ToList();
-            }
-            else
-            {
-                listProduct = objWebAspDbEntities.Products.Where(b => b.CategoryId == Id && b.ShowOnHomePage.HasValue && b.ShowOnHomePage.Value == true).ToList();
+                ViewBag.Error = "Không thể tải danh sách sản phẩm.";
+                return View(new List<Product>());
             }
 
-            // Tính tổng số sản phẩm
-            int totalProducts = listProduct.Count;
+            var jsonString = await response.Content.ReadAsStringAsync();
+            var allProducts = JsonConvert.DeserializeObject<List<Product>>(jsonString);
+
+            // Lọc theo CategoryId và ShowOnHomePage == true
+            var filteredProducts = allProducts
+                .Where(p => (Id == 0 || p.CategoryId == Id) && p.ShowOnHomePage == true)
+                .ToList();
+
+            // Tổng số sản phẩm
+            int totalProducts = filteredProducts.Count;
 
             // Phân trang
-            var paginatedProducts = listProduct.Skip((page - 1) * pageSize).Take(pageSize).ToList();
+            var paginatedProducts = filteredProducts
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToList();
 
-            // Truyền dữ liệu cần thiết sang ViewBag
+            // Truyền ViewBag
             ViewBag.CurrentCategoryId = Id;
             ViewBag.CurrentPage = page;
             ViewBag.TotalPages = (int)Math.Ceiling((double)totalProducts / pageSize);
@@ -97,7 +117,6 @@ namespace TechMall.Controllers
                     string json = await response.Content.ReadAsStringAsync();
                     allProducts = JsonConvert.DeserializeObject<List<ProductViewModel>>(json);
 
-                    // Gán mặc định
                     foreach (var p in allProducts)
                     {
                         p.Deleted = p?.Deleted ?? false;
@@ -109,7 +128,6 @@ namespace TechMall.Controllers
                         p.FullDescription = p.FullDescription ?? "";
                     }
 
-                    // Lọc theo tên danh mục nếu có
                     if (!string.IsNullOrEmpty(categoryName))
                     {
                         allProducts = allProducts
@@ -117,7 +135,6 @@ namespace TechMall.Controllers
                             .ToList();
                     }
 
-                    // Lọc sản phẩm chưa bị xóa
                     allProducts = allProducts.Where(p => !p.Deleted).ToList();
                 }
             }
@@ -137,58 +154,62 @@ namespace TechMall.Controllers
         }
 
 
-        //GET: Register
-
         public ActionResult Register()
         {
             return View();
         }
 
-        //POST: Register
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Register(User _user)
+        public async Task<ActionResult> Register(UserVM model)
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
+                return View();
+
+            model.Admin = false;
+            model.CreatedAt = DateTime.Now;
+
+            using (var client = new HttpClient())
             {
-                var check = objWebAspDbEntities.Users.FirstOrDefault(s => s.Email == _user.Email);
-                if (check == null)
+                client.BaseAddress = new Uri("http://localhost:8080");
+
+                int newId;
+                bool idExists;
+
+                do
                 {
-                    _user.Password = GetMD5(_user.Password);
-                    _user.IsAdmin = false;
-                    _user.CreatedAt = DateTime.Now;
-                    objWebAspDbEntities.Configuration.ValidateOnSaveEnabled = false;
-                    objWebAspDbEntities.Users.Add(_user);
-                    objWebAspDbEntities.SaveChanges();
-                    return RedirectToAction("Index");
+                    newId = new Random().Next(10000, 99999);
+
+                    var checkResponse = await client.GetAsync($"/api/users/{newId}");
+                    idExists = checkResponse.IsSuccessStatusCode;
+                }
+                while (idExists);
+
+                model.Id = newId;
+
+                model.Password = model.Password;
+                System.Diagnostics.Debug.WriteLine("Password gửi đi là: " + model.Password);
+
+
+                var json = JsonConvert.SerializeObject(model);
+                System.Diagnostics.Debug.WriteLine("Dữ liệu JSON gửi đi: " + json);
+
+                var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+                var response = await client.PostAsync("/api/users", content);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    return RedirectToAction("Login");
                 }
                 else
                 {
-                    ViewBag.error = "Email đã tồn tại!";
+                    ViewBag.error = "Đăng ký thất bại hoặc email đã tồn tại";
                     return View();
                 }
-
-
             }
-            return View();
-
-
         }
-        //create a string MD5
-        public static string GetMD5(string str)
-        {
-            MD5 md5 = new MD5CryptoServiceProvider();
-            byte[] fromData = Encoding.UTF8.GetBytes(str);
-            byte[] targetData = md5.ComputeHash(fromData);
-            string byte2String = null;
 
-            for (int i = 0; i < targetData.Length; i++)
-            {
-                byte2String += targetData[i].ToString("x2");
-
-            }
-            return byte2String;
-        }
 
         public ActionResult Login()
         {
@@ -197,29 +218,53 @@ namespace TechMall.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Login(string email, string password)
+        public async Task<ActionResult> Login(string email, string password)
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
+                return View();
+
+            //var hashedPassword = GetMD5(password);
+            var loginData = new { email = email, password = password };
+            var json = JsonConvert.SerializeObject(loginData);
+            var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+            using (var client = new HttpClient())
             {
+                client.DefaultRequestHeaders.Accept.Clear();
+                client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
+                var response = await client.PostAsync("http://localhost:8080/api/users/login", content);
+                var responseData = await response.Content.ReadAsStringAsync();
+                System.Diagnostics.Debug.WriteLine("API RESPONSE: " + responseData);
 
-                var f_password = GetMD5(password);
-                var data = objWebAspDbEntities.Users.Where(s => s.Email.Equals(email) && s.Password.Equals(f_password)).ToList();
-                if (data.Count() > 0)
+                if (response.IsSuccessStatusCode)
                 {
-                    //add session
-                    Session["FullName"] = data.FirstOrDefault().FirstName + " " + data.FirstOrDefault().LastName;
-                    Session["Email"] = data.FirstOrDefault().Email;
-                    Session["idUser"] = data.FirstOrDefault().Id;
+                    var user = JsonConvert.DeserializeObject<UserVM>(responseData);
+                    Session["FullName"] = user.FirstName + " " + user.LastName;
+                    Session["Email"] = user.Email;
+                    Session["idUser"] = user.Id;
                     return RedirectToAction("Index");
                 }
-                else
-                {
-                    ViewBag.error = "Đăng nhập thất bại";
-                    return RedirectToAction("Login");
-                }
+
+                ViewBag.error = "Đăng nhập thất bại";
+                return View();
             }
-            return View();
+        }
+
+
+        private string GetMD5(string str)
+        {
+            using (var md5 = System.Security.Cryptography.MD5.Create())
+            {
+                byte[] inputBytes = Encoding.ASCII.GetBytes(str);
+                byte[] hashBytes = md5.ComputeHash(inputBytes);
+
+                StringBuilder sb = new StringBuilder();
+                foreach (var b in hashBytes)
+                    sb.Append(b.ToString("X2"));
+
+                return sb.ToString().ToLower();
+            }
         }
 
 
@@ -231,71 +276,99 @@ namespace TechMall.Controllers
         }
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult HandleFirebaseLogin(FirebaseUserModel model)
+        public async Task<ActionResult> HandleFirebaseLogin(FirebaseUserModel model)
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
+                return Json(new { success = false });
+
+            using (var client = new HttpClient())
             {
-                // Kiểm tra người dùng trong database hoặc tạo mới
-                var user = objWebAspDbEntities.Users.FirstOrDefault(u => u.Email == model.Email);
-                if (user == null)
+                client.BaseAddress = new Uri("http://localhost:8080");
+
+                // Kiểm tra xem user đã tồn tại chưa
+                var check = await client.GetAsync($"/api/users/email/{model.Email}");
+                User user;
+
+                if (check.IsSuccessStatusCode)
                 {
-                    user = new User
+                    var json = await check.Content.ReadAsStringAsync();
+                    user = JsonConvert.DeserializeObject<User>(json);
+                }
+                else
+                {
+                    // Nếu chưa có, tạo mới
+                    var newUser = new User
                     {
                         DisplayName = model.DisplayName,
                         Email = model.Email,
                         Provider = model.Provider,
                         FirebaseUid = model.Uid
                     };
-                    objWebAspDbEntities.Users.Add(user);
-                    objWebAspDbEntities.SaveChanges();
+
+                    var json = JsonConvert.SerializeObject(newUser);
+                    var content = new StringContent(json, Encoding.UTF8, "application/json");
+                    var response = await client.PostAsync("/api/users", content);
+
+                    if (!response.IsSuccessStatusCode)
+                        return Json(new { success = false });
+
+                    var createdJson = await response.Content.ReadAsStringAsync();
+                    user = JsonConvert.DeserializeObject<User>(createdJson);
                 }
 
-                // Lưu thông tin đăng nhập vào session
                 Session["UserId"] = user.Id;
                 Session["UserEmail"] = user.Email;
                 Session["UserName"] = user.DisplayName;
 
                 return Json(new { success = true });
             }
-
-            return Json(new { success = false });
         }
+
 
         [HttpGet]
         public JsonResult CheckLoginStatus()
         {
-            bool isLoggedIn = Session["idUser"] != null;
+            bool isLoggedIn = Session["UserId"] != null;
             return Json(isLoggedIn, JsonRequestBehavior.AllowGet);
         }
-        public ActionResult LiveSearch(string query)
+
+        public async Task<ActionResult> LiveSearch(string query)
         {
             if (string.IsNullOrEmpty(query))
+                return Content("");
+
+            using (var client = new HttpClient())
             {
-                return Content(""); // Nếu không có từ khóa, trả về rỗng
+                client.BaseAddress = new Uri("http://localhost:8080");
+                var response = await client.GetAsync($"/api/products/search?query={Uri.EscapeDataString(query)}");
+
+                if (!response.IsSuccessStatusCode)
+                    return Content("Không thể tìm kiếm.");
+
+                var json = await response.Content.ReadAsStringAsync();
+                var results = JsonConvert.DeserializeObject<List<Product>>(json);
+
+                return PartialView("_SearchResults", results);
             }
-
-            // Tìm kiếm trong database
-            var results = objWebAspDbEntities.Products
-                .Where(p => p.Name.Contains(query) || p.ShortDes.Contains(query))
-                .Take(10) // Giới hạn số kết quả (ví dụ: 10 kết quả)
-                .ToList();
-
-            // Trả về một PartialView chứa danh sách kết quả
-            return PartialView("_SearchResults", results);
-        }
-        private WebAspDbEntities _context;
-
-        public HomeController()
-        {
-            _context = new WebAspDbEntities();
         }
 
-        // Action trả về danh sách danh mục dưới dạng JSON
         [HttpGet]
-        public ActionResult GetCategories()
+        public async Task<ActionResult> GetCategories()
         {
-            var categories = _context.Categories.ToList();
-            return Json(categories, JsonRequestBehavior.AllowGet);
+            using (var client = new HttpClient())
+            {
+                client.BaseAddress = new Uri("http://localhost:8080");
+                var response = await client.GetAsync("/api/categories");
+
+                if (!response.IsSuccessStatusCode)
+                    return Json(new List<Category>(), JsonRequestBehavior.AllowGet);
+
+                var json = await response.Content.ReadAsStringAsync();
+                var categories = JsonConvert.DeserializeObject<List<Category>>(json);
+
+                return Json(categories, JsonRequestBehavior.AllowGet);
+            }
         }
+
     }
 }

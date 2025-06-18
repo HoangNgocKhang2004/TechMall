@@ -8,6 +8,7 @@ using System.Web;
 using System.Web.Mvc;
 using TechMall.Context;
 using TechMall.Models;
+using TechMall.Models.ViewModels;
 
 namespace TechMall.Controllers
 {
@@ -17,19 +18,49 @@ namespace TechMall.Controllers
         // GET: Product
         public async Task<ActionResult> Detail(int Id)
         {
+            ProductVM product = null;
+
             using (var client = new HttpClient())
             {
                 client.BaseAddress = new Uri("http://localhost:8080/");
+
                 var response = await client.GetAsync($"api/products/{Id}");
-                if (response.IsSuccessStatusCode)
+                if (!response.IsSuccessStatusCode)
                 {
-                    var jsonString = await response.Content.ReadAsStringAsync();
-                    var product = JsonConvert.DeserializeObject<ProductViewModel>(jsonString);
-                    return View(product);
+                    return HttpNotFound();
                 }
-                return HttpNotFound();
+
+                var jsonString = await response.Content.ReadAsStringAsync();
+                product = JsonConvert.DeserializeObject<ProductVM>(jsonString);
+
+                // Lấy thông tin danh mục
+                if (product.CategoryId.HasValue)
+                {
+                    var categoryRes = await client.GetAsync($"api/categories/{product.CategoryId.Value}");
+                    if (categoryRes.IsSuccessStatusCode)
+                    {
+                        var categoryJson = await categoryRes.Content.ReadAsStringAsync();
+                        var category = JsonConvert.DeserializeObject<CategoryViewModel>(categoryJson);
+                        product.CategoryName = category?.Name;
+                    }
+                }
+
+                // Lấy thông tin thương hiệu
+                if (product.BrandId.HasValue)
+                {
+                    var brandRes = await client.GetAsync($"api/brands/{product.BrandId.Value}");
+                    if (brandRes.IsSuccessStatusCode)
+                    {
+                        var brandJson = await brandRes.Content.ReadAsStringAsync();
+                        var brand = JsonConvert.DeserializeObject<BrandViewModel>(brandJson);
+                        product.BrandName = brand?.Name;
+                    }
+                }
             }
+
+            return View(product);
         }
+
 
     }
 }

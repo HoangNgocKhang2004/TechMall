@@ -75,7 +75,7 @@
 
                         // Thêm các danh mục vào dropdown
                         data.forEach(function (category) {
-                            dropdownMenu.append('<a class="dropdown-item" href="/Home/Grid/' + category.Id + '">' + category.Name + '</a>');
+                            dropdownMenu.append('<a class="dropdown-item" href="/Home/Grid?categoryName=' + category.Name + '">' + category.Name + '</a>');
                         });
                     }
                 },

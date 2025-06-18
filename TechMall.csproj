@@ -2654,6 +2654,12 @@
     <Compile Include="Models\HomeViewModel.cs" />
     <Compile Include="Models\OrderViewModel.cs" />
     <Compile Include="Models\ProductViewModel.cs" />
+    <Compile Include="Models\ViewModels\BrandViewModel.cs" />
+    <Compile Include="Models\ViewModels\CategoryViewModel.cs" />
+    <Compile Include="Models\ViewModels\OrderDetailVM.cs" />
+    <Compile Include="Models\ViewModels\OrderVM.cs" />
+    <Compile Include="Models\ViewModels\ProductVM.cs" />
+    <Compile Include="Models\ViewModels\UserVM.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
